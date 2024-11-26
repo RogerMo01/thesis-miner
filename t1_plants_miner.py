@@ -92,7 +92,7 @@ def parse():
         else:
             names_corrected.append(n)
             
-    with open('t1_monographs.json', 'w', encoding='utf-8') as f:
+    with open('t1_plants.json', 'w', encoding='utf-8') as f:
         json.dump({'names': plants, 'names_corrected': names_corrected}, f, indent=4)
 
 
