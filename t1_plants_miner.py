@@ -44,7 +44,7 @@ def parse():
     plants: list[str] = []
     discart_list: list[str] = []
 
-    for page in doc.pages(199, 620):
+    for page in doc.pages(START_PAGE, END_PAGE):
         blocks = page.get_text("dict", flags=11)["blocks"]
 
         for b in blocks:  # iterate through the text blocks
