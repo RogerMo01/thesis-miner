@@ -87,8 +87,8 @@ def format_scientific_name(monographs):
             if not field in response_dict[plant]: response_dict[plant][field] = ""
         
         # Set Family names in uppercase
-        response_dict[plant]['family'] = response_dict[plant]['family'].upper()
-        response_dict[plant]['subfamily'] = response_dict[plant]['subfamily'].upper()
+        response_dict[plant]['family'] = response_dict[plant]['family'].capitalize()
+        response_dict[plant]['subfamily'] = response_dict[plant]['subfamily'].capitalize()
 
     return response_dict
                 
