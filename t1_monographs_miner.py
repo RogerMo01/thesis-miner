@@ -16,13 +16,22 @@ def load_names():
         data = json.load(file)
     return data['names'], data['names_corrected']
 
-
+def skips_this(name: str, skips: dict[str, int]):
+    try:
+        if skips[name] > 0:
+            skips[name] -= 1
+            return True
+    except KeyError:
+        pass
+    return False
 
 def extract_tokenized_plants():
     plants_names, corrected_plants_names = load_names()
     next_index = 0
     next_plant = plants_names[next_index]
     current_plant = ""
+    skips = {'Artemisa ': 1}
+
 
     tokenized_plants = dict()
 
@@ -35,8 +44,10 @@ def extract_tokenized_plants():
         for b in blocks:  # iterate through the text blocks
             for l in b["lines"]:  # iterate through the text lines
                 for token in l['spans']:  # iterate through the text spans
+
+                    skip = skips_this(potential_name + token['text'], skips)
                     
-                    if any(plant.startswith(potential_name + token['text']) for plant in plants_names[next_index:]):
+                    if any(plant.startswith(potential_name + token['text']) for plant in plants_names[next_index:]) and not skip:
                         # Keep extending prefix
                         potential_name += token['text']
                         potential_tokens.append(token)
