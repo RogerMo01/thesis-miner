@@ -123,6 +123,19 @@ def extract_monographs(tokenized_plants):
 
 
 
+def fix_errors_manually(monographs: dict[str, dict]):
+    # Sticked sections
+    monographs['Almácigo']['Sy'] = "Bursera gummifera L., Elaphrium simaruba (L.) Rose, Pistacia simaruba L., Terebinthus simaruba W. F. Wright."
+    monographs['Almácigo']['Vul'] = "Azucarero, aceitero, alm\u00e1cigo colorado (Cuba); gum tree, turpentine, West Indian birch (Florida y Antillas Inglesas); chaca piocha, palo mulato, palo colorado, quiote, zongolica (M\u00e9xico); alm\u00e1cigo encarnado, archip\u00edn (Puerto Rico); ji\u00f1ocuabe (Nicaragua); carana, ji\u00f1ocuave (Costa Rica); chinacahuite, jicote chino, palo chino (Guatemala); cop\u00f3n, palo chino (Honduras); indio desnudo, pellejo de indio (Guayana); caratero (Colombia)."
+
+    monographs['Chichicate ']['Sy'] = "Urtica baccifera L."
+    monographs['Chichicate ']['Vul'] = "Chichicastre: hoja de chichicastre, jamo (Cuba); ortiga blanca, ortiga de la tierra (Puerto Rico); pringamozo (Venezuela); nettle (Antillas Inglesas); chichacastle, ortiga de caballo (M\u00e9xico); chichicazte (Guatemala); chichicazte nigua (El Salvador); ortiga (Panam\u00e1); guaina, pringamosa (Colombia)."
+
+    monographs['Guamá candelón ']['Sy'] = "Erythrina piscipula L., 1. piscipula (L.) Hitch., P. erythrina L."
+    monographs['Guamá candelón ']['Vul'] = "Candel\u00f3n, guam\u00e1 hediondo (Cuba); dogwood (Jamaica); ventura (Puerto Rico); fish poison (Florida); palo emborrachador (Venezuela); bois de chiens, bois enivrent, mort a poissons (Antillas Francesas); colango naranga (Brasil); cocuite, chijol, flor de papagallo, habi, javin (M\u00e9xico)"
+
+
+
 
 tokenized_plants = extract_tokenized_plants()
 monographs = extract_monographs(tokenized_plants)
@@ -131,6 +144,10 @@ monographs = extract_monographs(tokenized_plants)
 for plant, _ in monographs.items():
     monographs[plant]['Bib'] += monographs[plant]['Bb']
     del monographs[plant]['Bb']
+
+# Fix puntual stuff
+fix_errors_manually(monographs)
+
 
 with open('t1_monographs.json', 'w', encoding='utf-8') as f:
     json.dump(monographs, f, indent=4)
