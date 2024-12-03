@@ -16,7 +16,7 @@ def fix_syn(syn: str) -> str:
 
     return syn
 
-def format_synonyms(monographs: dict):
+def format_synonyms(monographs: dict) -> list[str]:
     """Returns a dict, using plant names as key, and each key store the list of synonyms"""
     response_dict = dict()
 
@@ -44,7 +44,7 @@ def format_synonyms(monographs: dict):
 
     
 
-def format_scientific_name(monographs):
+def format_scientific_name(monographs: dict) -> dict[str, dict]:
     """Returns a dict, using plant names as key, and each key store a dictionary with scientifi name information"""
     response_dict = dict()
     fileds = ['raw', 'genus', 'species', 'authors', 'var', 'subsp', 'f', 'subfamily', 'family']
@@ -91,10 +91,81 @@ def format_scientific_name(monographs):
         response_dict[plant]['subfamily'] = response_dict[plant]['subfamily'].capitalize()
 
     return response_dict
-                
 
 
 
+def fix_vulgar_name(name: str) -> str:
+    def remove_prefix(name_: str) -> str:
+        prefix = ""
+        for i in name_:
+            if i in [' ', '.', ';']:
+                prefix += i
+            else: break
+        return name_.removeprefix(prefix)
+    
+    name = remove_prefix(name)
+    name = name[::-1]
+    name = remove_prefix(name)
+    name = name[::-1]
+    return name
+
+def extract_vulgar_names(raw: str) -> tuple[str, list[str]]:
+    region = "No Especificada"
+
+    # Extract region
+    temp_region = ""
+    found = False
+    for c in raw:
+        if c == '(':
+            found = True
+        elif c == ')':
+            region = temp_region
+            break
+        elif found:
+            temp_region += c
+
+    raw = raw.replace(f"({region})", "")
+
+    # Extract names
+    names = [fix_vulgar_name(x) for x in raw.split(',')]
+    names = [name for name in names if name != '']
+    return region, names
+
+
+def split_regions(raw: str) -> str:
+    response = []
+
+    potential = ""
+    for c in raw:
+        potential += c
+        if c == ')':
+            response.append(potential)
+            potential = ""
+    
+    return response
+
+
+def format_other_vulgar_names(monographs: dict):
+    """Returns a dict, using plant names as key, and each key store a dictionary with other vulgar names by region"""
+    response_dict = dict()
+    unknown_only_region = ["Avellano de costa "]
+
+    for plant, monograph in monographs.items():
+        response_dict[plant] = dict()
+
+        vul_raw: str = monograph['Vul']
+
+        splitted_by_region = split_regions(vul_raw)
+
+        # Vulgar names of one unespecified region
+        if plant in unknown_only_region:
+            splitted_by_region = [vul_raw]
+
+        for names_in_region in splitted_by_region:
+            region, names = extract_vulgar_names(names_in_region)
+            response_dict[plant][region] = names
+    
+    return response_dict
 
 
 # Open and read the JSON file
@@ -103,12 +174,14 @@ with open('t1_monographs.json', 'r') as file:
 
 syns = format_synonyms(monographs=data)
 sc_names = format_scientific_name(monographs=data)
+vul_names = format_other_vulgar_names(monographs=data)
 
 # Update changes
 new_data = data.copy()
 for plant, _ in data.items():
     new_data[plant]['Sy'] = syns[plant]
     new_data[plant]['Sc'] = sc_names[plant]
+    new_data[plant]['Vul'] = vul_names[plant]
 
 # Save changes
 with open('t1_monographs_formated.json', 'w', encoding='utf-8') as f:
