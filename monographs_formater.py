@@ -200,10 +200,17 @@ def format_biblio(monographs: dict):
 
     return response_dict
 
+############################################################################
 
+
+
+
+# TOMO 1: 1
+# TOMO 2: 2
+TOMO_SELECTOR = 2
 
 # Open and read the JSON file
-with open('t1_monographs.json', 'r') as file:
+with open(f't{TOMO_SELECTOR}_monographs.json', 'r') as file:
     data: dict = json.load(file)
 
 syns = format_synonyms(monographs=data)
@@ -220,6 +227,6 @@ for plant, _ in data.items():
     new_data[plant]['Bib'] = bib[plant]
 
 # Save changes
-with open('t1_monographs_formated.json', 'w', encoding='utf-8') as f:
+with open(f't{TOMO_SELECTOR}_monographs_formated.json', 'w', encoding='utf-8') as f:
     json.dump(new_data, f, indent=4)
 
