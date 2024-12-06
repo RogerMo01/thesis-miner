@@ -168,6 +168,40 @@ def format_other_vulgar_names(monographs: dict):
     return response_dict
 
 
+def fix_bib(bib: str):
+    # Remove unnecesary spaces
+    while bib.startswith(" "):
+        bib = bib.removeprefix(" ")
+    while bib.endswith(" "):
+        bib = bib.removesuffix(" ")
+    return bib
+
+
+def format_biblio(monographs: dict):
+    """Returns a dict, using plant names as key, and each key store the list of bibliographs"""
+    response_dict = dict()
+
+    for plant, monograph in monographs.items():
+        response_dict[plant] = []
+
+        bib_raw: str = monograph['Bib']
+
+        year_count = 0
+        current = ""
+        for c in bib_raw:
+            current += c
+            if c.isdigit():
+                year_count += 1
+            elif c == "." and year_count == 4:
+                response_dict[plant].append(fix_bib(current))
+                current = ""
+            else:
+                year_count = 0
+
+    return response_dict
+
+
+
 # Open and read the JSON file
 with open('t1_monographs.json', 'r') as file:
     data: dict = json.load(file)
@@ -175,6 +209,7 @@ with open('t1_monographs.json', 'r') as file:
 syns = format_synonyms(monographs=data)
 sc_names = format_scientific_name(monographs=data)
 vul_names = format_other_vulgar_names(monographs=data)
+bib = format_biblio(monographs=data)
 
 # Update changes
 new_data = data.copy()
@@ -182,6 +217,7 @@ for plant, _ in data.items():
     new_data[plant]['Sy'] = syns[plant]
     new_data[plant]['Sc'] = sc_names[plant]
     new_data[plant]['Vul'] = vul_names[plant]
+    new_data[plant]['Bib'] = bib[plant]
 
 # Save changes
 with open('t1_monographs_formated.json', 'w', encoding='utf-8') as f:
