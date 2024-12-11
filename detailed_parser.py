@@ -1,20 +1,13 @@
-import json
 
 
-def fix_syn(syn: str) -> str:
-    """Fix wrong or unnecesary characters in synonyms"""
+def del_spaces(term: str) -> str:
+    """Remove unnecesary space characters in terms"""
+    while term.startswith(" "):
+        term = term.removeprefix(" ")
+    while term.endswith(" "):
+        term = term.removesuffix(" ")
 
-    # Remove unnecesary spaces
-    while syn.startswith(" "):
-        syn = syn.removeprefix(" ")
-    while syn.endswith(" "):
-        syn = syn.removesuffix(" ")
-
-    # Replace (1.) by (I.)
-    replaced_syn = syn.replace("1.", "I.")
-    syn = replaced_syn
-
-    return syn
+    return term
 
 def format_synonyms(monographs: dict) -> list[str]:
     """Returns a dict, using plant names as key, and each key store the list of synonyms"""
@@ -31,7 +24,7 @@ def format_synonyms(monographs: dict) -> list[str]:
         for char in syns_raw:
             if count == len(syns_raw) or char == ',' or char == ';':
 
-                response_dict[plant].append(fix_syn(temp_syn))
+                response_dict[plant].append(del_spaces(temp_syn))
                 temp_syn = ""
             else:
                 temp_syn += char
@@ -56,7 +49,6 @@ def format_scientific_name(monographs: dict) -> dict[str, dict]:
 
         response_dict[plant]['raw'] = sc_raw
 
-        current_flag_i = 0
         props = {'var.':"var", 'Subfam.':"subfamily", 'Fam.':"family"}
         current_prop = 'authors'
         current_str = ""
@@ -70,9 +62,13 @@ def format_scientific_name(monographs: dict) -> dict[str, dict]:
                 # Species
                 response_dict[plant]['species'] = token
             else:
-                # Flags
+                # Other flags
                 if token in flags or i == len(tokens)-1:
-                    response_dict[plant][current_prop] = current_str
+                    response_dict[plant][current_prop] = del_spaces(current_str)  # Save content
+                    # Concat token in Fam. case
+                    if current_prop == "family": response_dict[plant][current_prop] = del_spaces(current_str + token)
+                    # Remove all spaces in Fam. and Subfam. names
+                    if current_prop in ["family", "subfamily"]: response_dict[plant][current_prop] = response_dict[plant][current_prop].replace(" ", "")
                     current_prop = props[token] if not i == len(tokens)-1 else ""
                     current_str = ""
 
@@ -134,7 +130,6 @@ def extract_vulgar_names(raw: str) -> tuple[str, list[str]]:
 
 def split_regions(raw: str) -> str:
     response = []
-
     potential = ""
     for c in raw:
         potential += c
@@ -148,7 +143,7 @@ def split_regions(raw: str) -> str:
 def format_other_vulgar_names(monographs: dict):
     """Returns a dict, using plant names as key, and each key store a dictionary with other vulgar names by region"""
     response_dict = dict()
-    unknown_only_region = ["Avellano de costa "]
+    unknown_only_region = ["Avellano de costa"]
 
     for plant, monograph in monographs.items():
         response_dict[plant] = dict()
@@ -168,14 +163,36 @@ def format_other_vulgar_names(monographs: dict):
     return response_dict
 
 
-def fix_bib(bib: str):
-    # Remove unnecesary spaces
-    while bib.startswith(" "):
-        bib = bib.removeprefix(" ")
-    while bib.endswith(" "):
-        bib = bib.removesuffix(" ")
-    return bib
 
+SPANISH_CHARACTERS = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ"
+
+def fix_biblio(bib: str):
+    count = 0
+    result = bib
+    for i in range(0, len(bib)-2):
+        char, next_char = bib[i], bib[i+1]
+
+        if char in SPANISH_CHARACTERS:
+            count += 1
+        else:
+            count = 0
+
+        if count == 1 and char in SPANISH_CHARACTERS and next_char == " ":
+            result = result.replace(f"{char}{next_char}", char, 1)
+    
+    result = result.replace("  ", " ")
+
+    # Capitalize author names
+    splitted_result = result.split(" ")
+    capitalized_result = []
+    for term in splitted_result:
+        if len(term) > 1 and all(c in SPANISH_CHARACTERS+",.;:ÁÉÍÓÚÜ" for c in term):
+            capitalized_result.append(term.capitalize())
+        else:
+            capitalized_result.append(term)
+
+    result = " ".join(capitalized_result)
+    return del_spaces(result)
 
 def format_biblio(monographs: dict):
     """Returns a dict, using plant names as key, and each key store the list of bibliographs"""
@@ -193,7 +210,7 @@ def format_biblio(monographs: dict):
             if c.isdigit():
                 year_count += 1
             elif c == "." and year_count == 4:
-                response_dict[plant].append(fix_bib(current))
+                response_dict[plant].append(fix_biblio(current))
                 current = ""
             else:
                 year_count = 0
@@ -204,29 +221,20 @@ def format_biblio(monographs: dict):
 
 
 
+def parse_detailed_sections(selector: int, data: dict):
 
-# TOMO 1: 1
-# TOMO 2: 2
-TOMO_SELECTOR = 2
+    # Parse data
+    syns = format_synonyms(monographs=data)
+    sc_names = format_scientific_name(monographs=data)
+    vul_names = format_other_vulgar_names(monographs=data)
+    bib = format_biblio(monographs=data)
 
-# Open and read the JSON file
-with open(f't{TOMO_SELECTOR}_monographs.json', 'r') as file:
-    data: dict = json.load(file)
+    # Update changes
+    new_data = data.copy()
+    for plant, _ in data.items():
+        new_data[plant]['Sy'] = syns[plant]
+        new_data[plant]['Sc'] = sc_names[plant]
+        new_data[plant]['Vul'] = vul_names[plant]
+        new_data[plant]['Bib'] = bib[plant]
 
-syns = format_synonyms(monographs=data)
-sc_names = format_scientific_name(monographs=data)
-vul_names = format_other_vulgar_names(monographs=data)
-bib = format_biblio(monographs=data)
-
-# Update changes
-new_data = data.copy()
-for plant, _ in data.items():
-    new_data[plant]['Sy'] = syns[plant]
-    new_data[plant]['Sc'] = sc_names[plant]
-    new_data[plant]['Vul'] = vul_names[plant]
-    new_data[plant]['Bib'] = bib[plant]
-
-# Save changes
-with open(f't{TOMO_SELECTOR}_monographs_formated.json', 'w', encoding='utf-8') as f:
-    json.dump(new_data, f, indent=4)
-
+    return new_data
