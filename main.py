@@ -158,7 +158,7 @@ def parse_sections(raw: str):
 
         token += " "
 
-        if any(c.isalpha() for c in token) and prefix_posibility(potential_flag + token):
+        if len(potential_flag + token) > 3 and any(c.isalpha() for c in token) and prefix_posibility(potential_flag + token):
             potential_flag += token
             found, flag_index = find_flag(potential_flag, current_index+1)
 
