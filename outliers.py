@@ -1,4 +1,30 @@
 
+values1: dict[str, dict] = {
+    "Alm\u00e1cigo": {
+        "Sy": [
+            "Bursera gummifera L.",
+            "Elaphrium simaruba (L.) Rose",
+            "Pistacia simaruba L.",
+            "Terebinthus simaruba W. F. Wright."
+        ],
+        "Vul": {
+            "Cuba": ["Azucarero", "aceitero", "alm\u00e1cigo colorado"],
+            "Florida y Antillas Inglesas": ["gum tree", "turpentine", "West Indian birch"],
+            "M\u00e9xico": ["chaca piocha", "palo mulato", "palo colorado", "quiote", "zongolica"],
+            "Puerto Rico": ["archip\u00edn", "alm\u00e1cigo encarnado"],
+            "Nicaragua": ["ji\u00f1ocuabe"],
+            "Costa Rica": ["ji\u00f1ocuave", "carana"],
+            "Guatemala": ["chinacahuite", "jicote chino", "palo chino"],
+            "Honduras": ["cop\u00f3n", "palo chino"],
+            "Guayana": ["indio desnudo", "pellejo de indio"],
+            "Colombia": ["caratero"]
+        }
+    },
+    "Calaminta*": {
+        "Des": "Es una planta vivaz que emite v\u00e1stagos de 30 a 90 cm de altura, con las hojas acopladas, aovados o redondeadas, obtusas, abruptamente contra\u00eddas en la base, con dientes superficiales en los bordes. De la axila superior nacen los ramilletes florales. Corola a lo sumo de 15 mm mas largo que el c\u00e1liz; florece en verano.",
+        "Cmp": "Contiene mucha esencia con el 57 % de pulegoma y mentosa y pireno. En las hojas se encuentra oxidasa."
+    }
+}
 values2: dict[str, dict] = {
     "Tebenque (1)": {
         "Use": "Toda la planta.",
@@ -12,4 +38,6 @@ def solve_2_outliers(input: dict[str, dict]):
             input[plant][field] = content
 
 def solve_1_outliers(input: dict[str, dict]):
-    pass
+    for plant, data in values1.items():
+        for field, content in data.items():
+            input[plant][field] = content

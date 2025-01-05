@@ -1308,32 +1308,54 @@
             "Bursera gummifera L.",
             "Elaphrium simaruba (L.) Rose",
             "Pistacia simaruba L.",
-            "Terebinthus simaruba W. F. Wright. OTROS NOMBES VULGARES. Azucarero",
-            "aceitero",
-            "alm\u00e1cigo colorado (Cuba)",
-            "gum tree",
-            "turpentine",
-            "West Indian birch (Florida y Antillas Inglesas)",
-            "chaca piocha",
-            "palo mulato",
-            "palo colorado",
-            "quiote",
-            "zongolica (M\u00e9xico)",
-            "alm\u00e1cigo encarnado",
-            "archip\u00edn (Puer\u00ad to Rico)",
-            "ji\u00f1ocuabe (Nicaragua)",
-            "carana",
-            "ji\u00f1ocuave (Costa Rica)",
-            "chinacahuite",
-            "jicote chino",
-            "palo chino (Guatemala)",
-            "cop\u00f3n",
-            "palo chino (Honduras)",
-            "indio desnudo",
-            "pellejo de indio (Guayana)",
-            "caratero (Colombia)"
+            "Terebinthus simaruba W. F. Wright."
         ],
-        "Vul": {},
+        "Vul": {
+            "Cuba": [
+                "Azucarero",
+                "aceitero",
+                "alm\u00e1cigo colorado"
+            ],
+            "Florida y Antillas Inglesas": [
+                "gum tree",
+                "turpentine",
+                "West Indian birch"
+            ],
+            "M\u00e9xico": [
+                "chaca piocha",
+                "palo mulato",
+                "palo colorado",
+                "quiote",
+                "zongolica"
+            ],
+            "Puerto Rico": [
+                "archip\u00edn",
+                "alm\u00e1cigo encarnado"
+            ],
+            "Nicaragua": [
+                "ji\u00f1ocuabe"
+            ],
+            "Costa Rica": [
+                "ji\u00f1ocuave",
+                "carana"
+            ],
+            "Guatemala": [
+                "chinacahuite",
+                "jicote chino",
+                "palo chino"
+            ],
+            "Honduras": [
+                "cop\u00f3n",
+                "palo chino"
+            ],
+            "Guayana": [
+                "indio desnudo",
+                "pellejo de indio"
+            ],
+            "Colombia": [
+                "caratero"
+            ]
+        },
         "Hab": "Es un \u00e1rbol elevado, que crece en toda la Isla, com\u00fan en los bosques y en los terrenos pedregosos pr\u00f3ximos a las costas. Es muy abundante y conocido. Se halla tam\u00ad bi\u00e9n en las dem\u00e1s Antillas, en la Florida, M\u00e9xico y en la Am\u00e9rica tropical continental.",
         "Des": "Es un \u00e1rbol que alcanza una altura m\u00e1xima de 20 m, 1 m de di\u00e1metro, las ramas extendidas, con la corteza 134 A pardo-rojiza, lisa y brillante, que se separan en delgadas l\u00e1minas. Hojas alternas, compuestas, lampi\u00f1as o a veces pubescentes, pecioladas, de 10 a 20 cm de largo; fol\u00edolos de 3 a 7, aovados a obovados, le textura firme, de 3 a 8 cm de longitud, agudos o acuminados. Inflorescencia axilar, flores pol\u00edgamodioicas; racimos lampi\u00f1os o pubescentes de 5 a 10 cm de largo; pedicelos de 4 a 8 mm de longitud. C\u00e1liz 4-5-lobado, l\u00f3bulos extendidos, como de 1 mm le largo; p\u00e9talos 4 o 5, verdosos, de 2 a 5 cm de largo, aovados a oblongo-lanceolados, mucho m\u00e1s largos que los l\u00f3bulos del c\u00e1liz, imbricados en el bot\u00f3n, insertos en la base del disco. Estambres de 8 a 10, libres, insertos en los p\u00e9talos. Disco, un anillo entero. Ovario s\u00e9sil, 3-locular. Fruto, una drupa oblonga, triangular, de 5 a 10 mm de largo, que suele hendirse en tres valvas; las semillas \u00f3seas, blancas, incluidas en una pulpa carnosa.",
         "Cmp": "",
@@ -4825,8 +4847,8 @@
             ]
         },
         "Hab": "Planta silvestre en Espa\u00f1a, en bos\u00ad ques fr\u00edos especialmente en setos y riveras, y en lugares incultos; se encuentra adem\u00e1s al pie de los muros en todo el pa\u00eds.",
-        "Des": "Es una planta vivaz que emite v\u00e1stagos de 30 a 90 cm de altura, con las hojas acopladas, aovados o redondeadas, obtusas, abruptamente contra\u00eddas en la base, con dientes superficiales en los bordes. De la axila superior nacen los ramilletes florales. Corola a lo sumo de 15 mm mas largo que el c\u00e1liz; florece en verano. COMPOSICION. Contiene mucha esencia con el 57 % de pulegoma y mentosa y pireno. En las hojas se encuentra oxidasa.",
-        "Cmp": "",
+        "Des": "Es una planta vivaz que emite v\u00e1stagos de 30 a 90 cm de altura, con las hojas acopladas, aovados o redondeadas, obtusas, abruptamente contra\u00eddas en la base, con dientes superficiales en los bordes. De la axila superior nacen los ramilletes florales. Corola a lo sumo de 15 mm mas largo que el c\u00e1liz; florece en verano.",
+        "Cmp": "Contiene mucha esencia con el 57 % de pulegoma y mentosa y pireno. En las hojas se encuentra oxidasa.",
         "Use": "",
         "Pro": "",
         "App": "Se considera t\u00f3nica y estom\u00e1quica. Se toma en forma de tisana un pu\u00f1adito de hojas en una taza de agua hirviente, con o sin az\u00facar. Las sumidades son antiespasm\u00f3dicas y en alto grado estimulantes, adem\u00e1s, son estomacales. Se emplea en el asma y en los catarros pulmonares y cr\u00f3nicos; tambi\u00e9n se usa con buenos resultados contra la amenorrea y las menstruaciones rebeldes.",
