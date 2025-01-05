@@ -3,6 +3,7 @@ from fitz import Document, Page
 import json
 from utils import levenshtein_distance
 from detailed_parser import parse_detailed_sections, del_spaces
+from outliers import solve_1_outliers, solve_2_outliers
 
 tomo1: Document = pymupdf.open("t1.pdf")
 tomo2: Document = pymupdf.open("t2.pdf")
@@ -133,7 +134,7 @@ FLAGS = ['Sy', 'Vul', 'Hab', 'Des', 'Cmp', 'Use', 'Pro', 'App', 'Cul', 'Bib', 'B
 def prefix_posibility(prefix: str):
     for trigger in FLAGS_TRIGGERS:
         trigger_prefix = trigger[0:len(prefix)]
-        if levenshtein_distance(prefix, trigger_prefix) < 3: return True
+        if levenshtein_distance(prefix, trigger_prefix) <= 2: return True
     return False
 
 def find_flag(potential_flag: str, start_index: int = 0) -> tuple[bool, int]:
@@ -152,9 +153,12 @@ def parse_sections(raw: str):
 
     response = {'Sc': "", 'Sy': "", 'Vul': "", 'Hab': "", 'Des': "", 'Cmp': "", 'Use': "", 'Pro': "", 'App': "", 'Cul': "", 'Bib': "", 'Bb': ""}
     for token in tokens:
+        if token.strip() == "":
+            continue
+
         token += " "
 
-        if prefix_posibility(potential_flag + token):
+        if any(c.isalpha() for c in token) and prefix_posibility(potential_flag + token):
             potential_flag += token
             found, flag_index = find_flag(potential_flag, current_index+1)
 
@@ -218,6 +222,13 @@ with open(f't{SELECTOR}_parsed.json', 'w', encoding='utf-8') as f:
 
 # Extract parsed detailed content from monographs
 monographs = parse_detailed_sections(SELECTOR, monographs)
+
+# Solve outliers hardcoded
+if SELECTOR == 1:
+    solve_1_outliers(monographs)
+elif SELECTOR == 2:
+    solve_2_outliers(monographs)
+
 
 # Save detailed parsed monographs
 with open(f't{SELECTOR}_details.json', 'w', encoding='utf-8') as f:
