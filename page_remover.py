@@ -1,6 +1,3 @@
-import json
-
-
 class PageRemover:
     def __init__(self):
         self.letters = ['A', 'B', 'C', 'CH', 'D', 'E', 'F', 'G', 'H', 'I', 'J']

@@ -1,6 +1,7 @@
 import pymupdf
 from fitz import Document, Page
 import json
+from figures_remover import FiguresRemover
 from page_remover import remove_pages
 from utils import levenshtein_distance
 from detailed_parser import parse_detailed_sections, del_spaces
@@ -232,7 +233,9 @@ if SELECTOR == 1:
 elif SELECTOR == 2:
     solve_2_outliers(monographs)
 
-
+# Remove figures
+fr = FiguresRemover(SELECTOR)
+fr.remove_figures(monographs)
 
 # Save detailed parsed monographs
 with open(f't{SELECTOR}_details.json', 'w', encoding='utf-8') as f:
