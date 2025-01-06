@@ -1,6 +1,7 @@
 import pymupdf
 from fitz import Document, Page
 import json
+from page_remover import remove_pages
 from utils import levenshtein_distance
 from detailed_parser import parse_detailed_sections, del_spaces
 from outliers import solve_1_outliers, solve_2_outliers
@@ -226,8 +227,11 @@ monographs = parse_detailed_sections(SELECTOR, monographs)
 # Solve outliers hardcoded
 if SELECTOR == 1:
     solve_1_outliers(monographs)
+    remove_pages(monographs)
+        
 elif SELECTOR == 2:
     solve_2_outliers(monographs)
+
 
 
 # Save detailed parsed monographs
