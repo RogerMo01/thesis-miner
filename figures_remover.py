@@ -58,10 +58,10 @@ class FiguresRemover():
 
     def _remove_from_str(self, text: str) -> str:
         figures = figures1 if self.s == 1 else figures2
-        subs = figures[self.current_i]
-        contains = subs in text
-        result = text.replace(subs, "") if contains else text
-        self.current_i = self.current_i + 1 if contains else self.current_i
-        if contains: print(f"Removed: {subs}")
-        return result
+        for subs in figures[self.current_i:]:
+            contains = subs in text
+            text = text.replace(subs, "") if contains else text
+            self.current_i = self.current_i + 1 if contains else self.current_i
+            if contains: print(f"Removed: {subs}")
+        return text
     
