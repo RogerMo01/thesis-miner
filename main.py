@@ -3,6 +3,7 @@ from fitz import Document, Page
 import json
 from figures_remover import FiguresRemover
 from page_remover import remove_pages
+from soft_hyphen_remover import remove_soft_hyphens
 from utils import levenshtein_distance
 from detailed_parser import parse_detailed_sections, del_spaces
 from outliers import solve_1_outliers, solve_2_outliers
@@ -192,7 +193,7 @@ def parse_sections(raw: str):
 ########################################################################
 
 
-SELECTOR = 1
+SELECTOR = 2
 
 splitted_monographs = split_monographs(SELECTOR)
 
@@ -236,6 +237,11 @@ elif SELECTOR == 2:
 # Remove figures
 fr = FiguresRemover(SELECTOR)
 fr.remove_figures(monographs)
+
+# Remove soft hyphes
+if SELECTOR == 1:
+    remove_soft_hyphens(monographs)
+
 
 # Save detailed parsed monographs
 with open(f't{SELECTOR}_details.json', 'w', encoding='utf-8') as f:
