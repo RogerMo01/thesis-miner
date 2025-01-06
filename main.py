@@ -4,7 +4,6 @@ import json
 from figures_remover import FiguresRemover
 from page_remover import remove_pages
 from unwanted_char_remover import remove_unwanted_chars
-from tabulations_remover import remove_tabs
 from utils import levenshtein_distance
 from detailed_parser import parse_detailed_sections, del_spaces
 from outliers import solve_1_outliers, solve_2_outliers
