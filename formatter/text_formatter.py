@@ -68,8 +68,9 @@ class Formatter:
     def run(self):
         self._log("engine", "started")
         plants_names = [k for k, _ in self.source_data.items()]
+        start_i = plants_names.index(self.current_plant)
         
-        for plant in plants_names:
+        for plant in plants_names[start_i:]:
             # Copy all plant data
             self.result[plant] = self.source_data[plant]
             
