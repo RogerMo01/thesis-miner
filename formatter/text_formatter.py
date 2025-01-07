@@ -77,46 +77,54 @@ class Formatter:
             for field in FIELDS_TO_REFORMATT:
                 content = self.source_data[plant][field]
                 
-                prompt = get_propmt(content)
+                if content == "":
+                    self.result[plant][field] = ""
+                    self._log("success", f"{plant}, {field}")
                 
-                tries = 0
-                tryagain = True
-                while tryagain:
-                    try:
-                        tries+=1
-                        llm_response = self.model.generate_content(
-                            prompt,
-                            generation_config=genai.GenerationConfig(
-                                response_mime_type="application/json", response_schema=FormattedText
-                            ),
-                            safety_settings={
-                                HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-                                HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
-                                HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-                                HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
-                            }
-                        ).text
-                        formatted_text = json.loads(llm_response)['formatted_text']
-                        
-                        self.result[plant][field] = formatted_text
-                        self._log("success", f"{plant}, {field}")
-                        tryagain = False
-                        tries = 0
-                        
-                    except Exception as e:
-                        if e.code == http.HTTPStatus.REQUEST_TIMEOUT or e.code == http.HTTPStatus.TOO_MANY_REQUESTS or e.code == http.HTTPStatus.INTERNAL_SERVER_ERROR or e.code == http.HTTPStatus.SERVICE_UNAVAILABLE:
-                            if tries == 3:
-                                # enougth trying
-                                tryagain = False
-                                tries = 0
-                                self.result[plant][field] = "fail"
-                                self._log("fail", f"{plant} {field} {e.code}")
-                                self._report_fail(plant, field)
+                else:
+                    # Empty field
+                    prompt = get_propmt(content)
+                    
+                    tries = 0
+                    tryagain = True
+                    while tryagain:
+                        try:
+                            tries+=1
+                            llm_response = self.model.generate_content(
+                                prompt,
+                                generation_config=genai.GenerationConfig(
+                                    response_mime_type="application/json", response_schema=FormattedText
+                                ),
+                                safety_settings={
+                                    HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+                                    HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
+                                    HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+                                    HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+                                }
+                            ).text
+                            formatted_text = json.loads(llm_response)['formatted_text']
+                            
+                            self.result[plant][field] = formatted_text
+                            self._log("success", f"{plant}, {field}")
+                            tryagain = False
+                            tries = 0
+                            
+                        except Exception as e:
+                            if e.code == http.HTTPStatus.REQUEST_TIMEOUT or e.code == http.HTTPStatus.TOO_MANY_REQUESTS or e.code == http.HTTPStatus.INTERNAL_SERVER_ERROR or e.code == http.HTTPStatus.SERVICE_UNAVAILABLE:
+                                if tries == 3:
+                                    # enougth trying
+                                    tryagain = False
+                                    tries = 0
+                                    self.result[plant][field] = "fail"
+                                    self._log("fail", f"{plant} {field} {e.code}")
+                                    self._report_fail(plant, field)
+                                else:
+                                    time.sleep(15)
                             else:
-                                time.sleep(15)
-                        else:
-                            raise e
+                                raise e
                         
+                        
+                            
             
             self._save_progress()
                 
@@ -185,7 +193,7 @@ class Formatter:
             self.result.update(json.load(file))
             file.close()
     
-    def _save_config(self, plant: str):
+    def _save_config(self):
         new_config = { "current_plant": self.current_plant }
         with open('formatter/config.json', 'w', encoding='utf-8') as file:
             json.dump(new_config, file, indent=4)
