@@ -1,4 +1,5 @@
 import json
+import unicodedata
 import pdfplumber
 
 start_page = 34
@@ -92,12 +93,11 @@ def fix_app_headers(l: list):
 
 
 # Application plant names cases
-def fix_plants_names(d: dict[str, list[str]]):
-    for app, items in d.items():
-        
+def fix_plants_names(d: dict[str, dict[str, list[str]]]):
+    for app, appdata in d.items():
         result = []
         last = ""
-        for item in items:
+        for item in appdata["plants"]:
             
             # Hardcoded fixes
             if item.startswith("Domingo") and last.startswith("Mamey de Santo"):
@@ -118,11 +118,100 @@ def fix_plants_names(d: dict[str, list[str]]):
             result.append(item)
             last = item
         
-        d[app] = result
+        d[app]["plants"] = result
+
+def fix_errors_hardcoded(apps: dict):
+    values = {
+        "CORROSIVOS": {
+            "plants": [
+                    "Ayapan\u00e1",
+                    "Cardo santo"
+                ],
+            "sys": []
+        },
+        "DEMULCENTES": {
+            "plants": [
+                "(Emolientes)",
+                "Ajonjol\u00ed",
+                "Arroz",
+                "Corojo",
+                "D\u00e1til",
+                "Grama",
+                "Lechuga cimarrona",
+                "Man\u00ed",
+                "Marpac\u00edfico",
+                "Orozuz",
+                "Puente de mono",
+                "Quimbomb\u00f3",
+                "Trigo"
+            ],
+            "sys": []
+        },
+        "DENTR\u00cdFICOS": {
+            "plants": [
+                "Bejuco le\u00f1atero"
+            ],
+            "sys": []
+        }
+    }
+    
+    del apps["DEMULCENTES DENTR\u00cdFICOS"]
+    for k, v in values.items():
+        apps[k] = v
+                
             
+def add_sys_and_complete_refs(d: dict[str, dict[str, list[str]]]):
+    ref_cases = []
+    for app, appdata in d.items():
+        add_cases = []
+        for item in appdata["plants"]:
+            # reference cases
+            if item.startswith("Véase") or item.startswith("(Véase"):
+                sy = item.split(" ")[-1]
+                if item.endswith(")"):
+                    sy = sy[:len(sy)-1]
+                sy = sy.upper()
+                
+                # Add reference
+                if sy in d:
+                    d[sy]['sys'].append(app)
+                else:
+                    # Try without accents
+                    unicoded = ''.join(c for c in unicodedata.normalize('NFD', sy) if unicodedata.category(c) != 'Mn')
+                    if unicoded in d:
+                        d[unicoded]['sys'].append(app)
+                    else:
+                        raise Exception(f"{sy} does not exists")
+                
+                ref_cases.append(app)
+                continue
             
+            # Extend cases
+            if item.startswith("("):
+                sy = item[1:len(item)-1]
+                sy = sy.upper()
+                
+                sys = []
+                if len(sy.split(" ")) > 1:
+                    for s in sy.split(" "):
+                        if len(s) > 2: sys.append(s)
+                else:
+                    sys.append(sy)
+                    
+                for s in sys:
+                    if s in d:
+                        [add_cases.append(x) for x in d[s]['plants'] if x not in d[app]['plants']]
+                    
+                continue
+                
+            if item not in add_cases:
+                add_cases.append(item)
             
+        d[app]['plants'] = add_cases
         
+    for case in ref_cases:
+        del d[case]
+    
         
 
 
@@ -136,21 +225,33 @@ splitted = raw_text.split('\n')
 splitted = fix_app_headers(splitted)
 
 # Group plants in json format (key: app)
-apps: dict[str, list[str]] = dict()
+apps: dict[str, dict[str, list[str]]] = dict()
 current_app = ""
 for token in splitted:
     if all(char.isupper() for char in token if char.isalpha()):
         if token.endswith(": "):
             current_app = token[:-2]
-            apps[current_app] = []
+            apps[current_app] = { "plants": [], "sys": []}
         else:
             raise Exception(f"Does not ends with (:): '{token}'")
     else:
-        apps[current_app].append(token)
+        apps[current_app]["plants"].append(token)
         
         
 fix_plants_names(apps)
-        
+
+fix_errors_hardcoded(apps)
+
+add_sys_and_complete_refs(apps)
+
+# Order data
+apps = {clave: apps[clave] for clave in sorted(apps)}
+sorted_apps = dict()
+for k, v in apps.items():
+    sorted_plants = sorted(v['plants'])
+    sorted_sys = sorted(v['sys'])
+    sorted_apps[k] = { 'plants': sorted_plants, 'sys': sorted_sys }
     
+
 with open('apps.json', 'w', encoding='utf-8') as f:
-    json.dump(apps, f, indent=4)
+    json.dump(sorted_apps, f, indent=4)
