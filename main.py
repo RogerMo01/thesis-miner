@@ -1,12 +1,12 @@
 import pymupdf
 from fitz import Document, Page
 import json
-from figures_remover import FiguresRemover
-from page_remover import remove_pages
-from unwanted_char_remover import remove_unwanted_chars
-from utils import levenshtein_distance
-from detailed_parser import parse_detailed_sections, del_spaces
-from outliers import solve_1_outliers, solve_2_outliers
+from utils.figures_remover import FiguresRemover
+from utils.page_remover import remove_pages
+from utils.unwanted_char_remover import remove_unwanted_chars
+from utils.utils import levenshtein_distance
+from utils.detailed_parser import parse_detailed_sections, del_spaces
+from utils.outliers import solve_1_outliers, solve_2_outliers
 
 tomo1: Document = pymupdf.open("t1.pdf")
 tomo2: Document = pymupdf.open("t2.pdf")
